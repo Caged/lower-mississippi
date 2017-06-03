@@ -1,0 +1,17 @@
+{
+  "name": "lower-mississippi",
+  "version": "0.0.1",
+  "description": "Multibeam Bathymetric Data for the Lower Mississippi River",
+  "main": "index.js",
+  "scripts": {
+    "run": "node src/index.js",
+    "generate-stats": "node src/stats.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Justin Palmer",
+  "license": "MIT",
+  "devDependencies": {
+    "byline": "^5.0.0",
+    "d3-scale": "^1.0.6"
+  }
+}
