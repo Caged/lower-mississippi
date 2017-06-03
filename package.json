@@ -12,6 +12,11 @@
   "license": "MIT",
   "devDependencies": {
     "byline": "^5.0.0",
+    "commander": "^2.9.0",
     "d3-scale": "^1.0.6"
+  },
+  "bin": {
+    "lm-stats": "bin/lm-stats",
+    "lm-img": "bin/lm-img"
   }
 }

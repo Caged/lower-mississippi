@@ -1,0 +1,34 @@
+#!/usr/bin/env node
+const fs        = require('fs')
+const path      = require('path')
+const commander = require('commander')
+const byline    = require('byline')
+
+commander
+  .version(require("../package.json").version)
+  .option('--stats <file>', 'precomputed stats from npm run generate-stats')
+  .option('--in <dir>', 'data directory containing xyz files')
+  .option('--out <png>', 'png to write')
+  .option('--rmstart [rmstart]', 'river mile to start from', -Infinity)
+  .option('--rmend [rmend]', 'river mile to end at', Infinity)
+  .parse(process.argv)
+
+/**
+ * Get a list of sorted xyz files by lowest river mile to highest river mile within the
+ * given range of --rmstart and --rmend
+ * @method getSortedFilePathsForRange
+ * @return {Array}  list of file paths
+ */
+function getSortedFilePathsForRange() {
+  let files = fs.readdirSync(commander.in)
+  files = files.filter(f => { return path.extname(f) == '.xyz' })
+  files.sort()
+
+  files = files.filter(f => {
+    let [_, vext] = f.split('-')
+    version = parseFloat(path.basename(vext, '.xyz'))
+    return version >= commander.rmstart && version <= commander.rmend
+  })
+
+  return files.map(f => { return path.join(commander.in, f) })
+}
