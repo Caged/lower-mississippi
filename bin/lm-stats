@@ -21,8 +21,13 @@ files = files
 
 const fileList = files.slice()
 
-function process() {
-  var stream = byline(fs.createReadStream(fileList.shift(), { encoding: 'utf8' }))
+console.log("Processing %s files...", fileList.length)
+
+function compute() {
+  var xyzfile = fileList.shift()
+  console.log("...Starting %s", xyzfile);
+  console.time("......" + xyzfile);
+  var stream = byline(fs.createReadStream(xyzfile, { encoding: 'utf8' }))
 
   stream.on('data', d => {
     [x, y, z] = d.split(' ').map(parseFloat)
@@ -35,10 +40,10 @@ function process() {
   })
 
   stream.on('end', () => {
+    console.timeEnd("......" + xyzfile);
     if(fileList.length > 0) {
-      process()
+      compute()
     } else {
-      // console.log(xmax, xmin, ymax, ymin, zmax, zmin);
       fs.writeFileSync('stats.json', JSON.stringify({
         files: files,
         x: [xmin, xmax],
@@ -49,4 +54,4 @@ function process() {
   })
 }
 
-process()
+compute()

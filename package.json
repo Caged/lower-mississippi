@@ -12,6 +12,7 @@
   "license": "MIT",
   "devDependencies": {
     "byline": "^5.0.0",
+    "canvas": "^1.6.5",
     "commander": "^2.9.0",
     "d3-scale": "^1.0.6"
   },

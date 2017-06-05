@@ -3,15 +3,74 @@ const fs        = require('fs')
 const path      = require('path')
 const commander = require('commander')
 const byline    = require('byline')
+const d3Scale   = require('d3-scale')
+const Canvas    = require('canvas')
 
 commander
   .version(require("../package.json").version)
   .option('--stats <file>', 'precomputed stats from npm run generate-stats')
   .option('--in <dir>', 'data directory containing xyz files')
   .option('--out <png>', 'png to write')
-  .option('--rmstart [rmstart]', 'river mile to start from', -Infinity)
-  .option('--rmend [rmend]', 'river mile to end at', Infinity)
+  .option('--rmstart <rmstart>', 'river mile to start from', -Infinity)
+  .option('--rmend <rmend>', 'river mile to end at', Infinity)
+  .option('--width <width>', 'width of resulting image', 5000)
+  .option('--height <height>', 'height of resulting image', 5000)
   .parse(process.argv)
+
+const output = fs.createWriteStream(commander.out, 'utf-8')
+
+/**
+ * Array of file paths to generate visualization from
+ * @type {Array}
+ */
+var xyzFiles = getSortedFilePathsForRange().slice()
+
+/**
+ * Precomputed stats files as run via lm-stats
+ * @type {Object}
+ */
+var stats = JSON.parse(fs.readFileSync(commander.stats))
+
+/**
+ * A linear color scale for z values representing river depth
+ * @type {Function}
+ */
+var color = d3Scale.scaleLinear()
+  .domain(stats.z)
+  .range(['#c0eaff', '#012773'])
+
+var x = d3Scale.scaleLinear()
+  .domain(stats.x)
+  .range([0, commander.width])
+
+var y = d3Scale.scaleLinear()
+  .domain(stats.y)
+  .range([0, commander.height])
+
+var canvas = new Canvas(commander.width, commander.height)
+var context = canvas.getContext('2d')
+
+compute()
+
+function compute() {
+  var curFile = xyzFiles.shift()
+  var stream = byline(fs.createReadStream(curFile, { encoding: 'utf8' }))
+  console.log("Processing %s", curFile)
+
+  stream.on('data', d => {
+
+  })
+
+
+  stream.on('end', () => {
+    if(xyzFiles.length > 0) {
+      compute()
+    } else {
+      console.log("Writing file...")
+      canvas.pngStream().pipe(output)
+    }
+  })
+}
 
 /**
  * Get a list of sorted xyz files by lowest river mile to highest river mile within the
